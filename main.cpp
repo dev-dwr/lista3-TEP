@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cstdlib>
 
 //zadanie 1
 class CNodeStatic {
@@ -7,7 +8,6 @@ public:
     void deleteChild(CNodeStatic *node) {
         for (int i = 0; i < iGetChildrenNumber(); i++) {
             if (&v_children[i] == node)
-
                 v_children.erase(v_children.begin() + i);
         }
     }
@@ -19,6 +19,8 @@ public:
 
     ~CNodeStatic() { //zadanie 2
         //  std::cout << "\nUsuwam wezel statyczny: " << i_val << std::endl;
+        while (!v_children.empty())
+            v_children.pop_back();
     };
 
     CNodeStatic *getParent() {
@@ -56,7 +58,6 @@ public:
         }
     }
 
-
     //zadanie 3
     void vPrintUp() {
         vPrint();
@@ -69,16 +70,8 @@ public:
         CNodeStatic clone_node(*node);
         clone_node.pc_parent_node = this;
         v_children.push_back(clone_node);
-        setParenttoChildren(pc_parent_node);
     }
 
-    //zadanie 4
-    void setParenttoChildren(CNodeStatic *parent) {
-        pc_parent_node = parent;
-        for (int i = 0; i < v_children.size(); i++) {
-            v_children[i].setParenttoChildren(this);
-        }
-    }
 
     //zadanie 2
     void v_tree_test1() {
@@ -153,9 +146,6 @@ public:
         c_root.vPrintAllBelow();
     }
 
-    void setRoot(CNodeStatic root_giv) {
-        c_root = root_giv;
-    }
 
     bool bMoveSubtree(CNodeStatic *pcParentNode, CNodeStatic *pcNewChildNode) {
         if (pcParentNode != NULL && pcNewChildNode != NULL) {
@@ -188,6 +178,10 @@ public:
 
     void vSetValue(int iNewVal) { i_val = iNewVal; };
 
+    int getValue() {
+        return i_val;
+    }
+
     int iGetChildrenNumber() { return (v_children.size()); };
 
     void vAddNewChild() {
@@ -195,6 +189,11 @@ public:
         el = new CNodeDynamic;
         el->pc_parent_node = this;
         v_children.push_back(el);
+    }
+
+    void vAddNewChild(CNodeDynamic *pcOtherNode) {
+        pcOtherNode->pc_parent_node = this;
+        v_children.push_back(pcOtherNode);
     }
 
     CNodeDynamic *pcGetChild(int iChildOffset) {
@@ -306,11 +305,15 @@ private:
 
 
 int main() {
-    std::cout << "Print all below" << std::endl;
+
     CNodeStatic root;
     root.v_tree_test1();
+    std::cout << "\nTASK2" << std::endl;
+    std::cout << "Print all below" << std::endl;
     root.vPrintAllBelow();
     std::cout << "\n" << std::endl;
+
+    std::cout << "\nTASK3" << std::endl;
     std::cout << "Print up: " << std::endl;
     root.pcGetChild(0)->pcGetChild(1)->vPrintUp();
 
@@ -333,7 +336,7 @@ int main() {
     std::cout << std::endl;
 
 
-    std::cout << "CNodeDynamic " << std::endl;
+    std::cout << "CNodeDynamic printAllBelow " << std::endl;
     CNodeDynamic *root3;
     root3 = new CNodeDynamic();
     root3->v_tree_test1();
@@ -352,6 +355,8 @@ int main() {
     std::cout << std::endl;
     std::cout << "Dynamiczne drzewa po polaczeniu: " << std::endl;
     tree3.bMoveSubtree(tree3.pcGetRoot()->pcGetChild(0), tree4.pcGetRoot()->pcGetChild(0));
+    std::cout << "PrintUp " << std::endl;
+//    dla dowolnego węzła wypisze wartości wszystkich jego rodziców, od wybranego węzła aż do korzenia
     tree3.pcGetRoot()->pcGetChild(0)->pcGetChild(2)->pcGetChild(0)->vPrintUp();
     std::cout << std::endl;
     tree3.vPrintTree();
